@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Luyện Tập Trọng Âm Tiếng Anh</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0f1117;
+    --surface: #1a1d2e;
+    --surface2: #252840;
+    --accent: #6c63ff;
+    --accent2: #ff6b9d;
+    --accent3: #43e97b;
+    --accent4: #f9ca24;
+    --text: #e8e8f0;
+    --text-muted: #8888aa;
+    --correct: #43e97b;
+    --wrong: #ff5370;
+    --border: rgba(108,99,255,0.2);
+    --shadow: 0 8px 32px rgba(0,0,0,0.4);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Nunito', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+  body::before {
+    content: '';
+    position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+    background:
+      radial-gradient(ellipse at 20% 20%, rgba(108,99,255,0.15) 0%, transparent 50%),
+      radial-gradient(ellipse at 80% 80%, rgba(255,107,157,0.1) 0%, transparent 50%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .container { max-width: 860px; margin: 0 auto; padding: 24px 16px; position: relative; z-index: 1; }
+
+  /* HEADER */
+  header { text-align: center; margin-bottom: 36px; }
+  header h1 {
+    font-size: 2rem; font-weight: 900;
+    background: linear-gradient(135deg, #6c63ff, #ff6b9d);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    margin-bottom: 6px;
+  }
+  header p { color: var(--text-muted); font-size: 0.95rem; }
+
+  /* SET SELECTOR */
+  .set-selector { margin-bottom: 32px; }
+  .set-selector h2 { font-size: 0.85rem; text-transform: uppercase; letter-spacing: 2px; color: var(--text-muted); margin-bottom: 12px; text-align: center; }
+  .set-buttons { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+  .set-btn {
+    background: var(--surface); border: 2px solid var(--border);
+    color: var(--text); padding: 10px 22px; border-radius: 50px;
+    font-family: 'Nunito', sans-serif; font-weight: 700; font-size: 0.95rem;
+    cursor: pointer; transition: all 0.2s;
+  }
+  .set-btn:hover { border-color: var(--accent); color: var(--accent); transform: translateY(-2px); }
+  .set-btn.active { background: var(--accent); border-color: var(--accent); color: #fff; box-shadow: 0 4px 20px rgba(108,99,255,0.4); }
+
+  /* PROGRESS */
+  .progress-bar-wrap { background: var(--surface); border-radius: 50px; height: 8px; margin-bottom: 8px; overflow: hidden; }
+  .progress-bar { height: 100%; background: linear-gradient(90deg, var(--accent), var(--accent2)); border-radius: 50px; transition: width 0.4s ease; }
+  .progress-info { display: flex; justify-content: space-between; font-size: 0.82rem; color: var(--text-muted); margin-bottom: 24px; }
+  .score-badge {
+    display: inline-flex; gap: 16px; background: var(--surface); border-radius: 50px;
+    padding: 4px 16px; font-size: 0.82rem;
+  }
+  .score-correct { color: var(--correct); font-weight: 700; }
+  .score-wrong { color: var(--wrong); font-weight: 700; }
+
+  /* QUESTION CARD */
+  .question-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 20px; padding: 28px; margin-bottom: 20px;
+    box-shadow: var(--shadow); animation: slideIn 0.3s ease;
+  }
+  @keyframes slideIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+  .q-number { font-family: 'Space Mono', monospace; font-size: 0.78rem; color: var(--accent); letter-spacing: 1px; margin-bottom: 10px; }
+  .q-text { font-size: 1.05rem; font-weight: 700; color: var(--text); margin-bottom: 20px; line-height: 1.5; }
+
+  /* OPTIONS */
+  .options { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  @media (max-width: 520px) { .options { grid-template-columns: 1fr; } }
+
+  .option-btn {
+    background: var(--surface2); border: 2px solid transparent;
+    border-radius: 14px; padding: 14px 18px; text-align: left;
+    cursor: pointer; transition: all 0.18s; color: var(--text);
+    font-family: 'Nunito', sans-serif; font-size: 0.92rem; font-weight: 600;
+    display: flex; align-items: flex-start; gap: 12px;
+  }
+  .option-btn:hover:not(:disabled) { border-color: var(--accent); background: rgba(108,99,255,0.1); transform: translateY(-1px); }
+  .option-btn:disabled { cursor: not-allowed; }
+  .option-label {
+    font-family: 'Space Mono', monospace; font-size: 0.78rem;
+    background: var(--accent); color: #fff; border-radius: 6px;
+    padding: 2px 7px; flex-shrink: 0; margin-top: 1px;
+  }
+  .option-word { font-weight: 800; font-size: 1rem; }
+  .option-btn.correct { background: rgba(67,233,123,0.12); border-color: var(--correct); }
+  .option-btn.correct .option-label { background: var(--correct); color: #111; }
+  .option-btn.wrong { background: rgba(255,83,112,0.12); border-color: var(--wrong); }
+  .option-btn.wrong .option-label { background: var(--wrong); }
+  .option-btn.reveal { background: rgba(67,233,123,0.08); border-color: rgba(67,233,123,0.4); }
+
+  /* EXPLANATION */
+  .explanation {
+    margin-top: 18px; padding: 18px 20px;
+    background: rgba(108,99,255,0.08); border-left: 4px solid var(--accent);
+    border-radius: 12px; animation: fadeIn 0.3s ease;
+  }
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+  .explanation h4 { font-size: 0.78rem; text-transform: uppercase; letter-spacing: 1.5px; color: var(--accent); margin-bottom: 10px; }
+  .phonetics { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 10px; }
+  .phonetic-item {
+    background: var(--surface2); border-radius: 8px; padding: 6px 12px;
+    font-size: 0.85rem; border: 1px solid var(--border);
+  }
+  .phonetic-item .ph-label { font-family: 'Space Mono', monospace; font-size: 0.72rem; color: var(--text-muted); display: block; }
+  .phonetic-item .ph-word { font-weight: 700; color: var(--text); }
+  .phonetic-item .ph-ipa { font-style: italic; color: var(--accent2); font-size: 0.82rem; }
+  .phonetic-item .ph-stress { font-size: 0.72rem; color: var(--text-muted); }
+  .phonetic-item.is-answer { border-color: var(--accent2); background: rgba(255,107,157,0.08); }
+  .explanation-text { font-size: 0.88rem; color: var(--text-muted); line-height: 1.7; }
+  .explanation-text strong { color: var(--text); }
+  .answer-tag {
+    display: inline-block; background: var(--accent2); color: #fff;
+    padding: 1px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: 700;
+    margin-left: 4px; vertical-align: middle;
+  }
+
+  /* NEXT BUTTON */
+  .next-btn {
+    display: block; width: 100%; padding: 14px;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    color: #fff; border: none; border-radius: 14px;
+    font-family: 'Nunito', sans-serif; font-size: 1rem; font-weight: 800;
+    cursor: pointer; margin-top: 16px; transition: all 0.2s;
+    box-shadow: 0 4px 20px rgba(108,99,255,0.3);
+    display: none;
+  }
+  .next-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 28px rgba(108,99,255,0.5); }
+  .next-btn.visible { display: block; }
+
+  /* RESULT SCREEN */
+  .result-screen {
+    text-align: center; padding: 48px 24px;
+    background: var(--surface); border-radius: 24px;
+    border: 1px solid var(--border); display: none;
+  }
+  .result-screen.visible { display: block; animation: slideIn 0.4s ease; }
+  .result-emoji { font-size: 4rem; margin-bottom: 16px; }
+  .result-screen h2 { font-size: 1.8rem; font-weight: 900; margin-bottom: 8px; }
+  .result-score { font-size: 3rem; font-weight: 900;
+    background: linear-gradient(135deg, var(--accent3), var(--accent4));
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin: 16px 0; }
+  .result-screen p { color: var(--text-muted); margin-bottom: 24px; }
+  .restart-btn {
+    background: var(--accent); color: #fff; border: none;
+    padding: 12px 32px; border-radius: 50px; font-family: 'Nunito', sans-serif;
+    font-size: 1rem; font-weight: 800; cursor: pointer;
+    box-shadow: 0 4px 20px rgba(108,99,255,0.4); transition: all 0.2s;
+  }
+  .restart-btn:hover { transform: translateY(-2px); }
+
+  .no-questions { text-align: center; color: var(--text-muted); padding: 48px; }
+</style>
+</head>
+<body>
+<div class="container">
+  <header>
+    <h1>🎯 Luyện Tập Trọng Âm</h1>
+    <p>Chọn từ có trọng âm khác với các từ còn lại</p>
+  </header>
+
+  <div class="set-selector">
+    <h2>Chọn Set</h2>
+    <div class="set-buttons" id="setButtons"></div>
+  </div>
+
+  <div id="quizArea">
+    <div class="progress-bar-wrap"><div class="progress-bar" id="progressBar"></div></div>
+    <div class="progress-info">
+      <span id="progressText">Câu 1 / 20</span>
+      <span class="score-badge">
+        <span class="score-correct" id="scoreCorrect">✓ 0</span>
+        <span class="score-wrong" id="scoreWrong">✗ 0</span>
+      </span>
+    </div>
+    <div id="questionContainer"></div>
+    <button class="next-btn" id="nextBtn" onclick="nextQuestion()">Câu tiếp theo →</button>
+  </div>
+
+  <div class="result-screen" id="resultScreen">
+    <div class="result-emoji" id="resultEmoji"></div>
+    <h2 id="resultTitle"></h2>
+    <div class="result-score" id="resultScore"></div>
+    <p id="resultMsg"></p>
+    <button class="restart-btn" onclick="restartSet()">Làm lại set này</button>
+  </div>
+</div>
+
+<script>
+// ===========================================================
+// DATA: questions[setIndex] = array of question objects
+// answer: index 0-3 (A=0, B=1, C=2, D=3) = odd one out
+// phonetics: IPA for each option [A,B,C,D]
+// stressPos: syllable index (1-based) where primary stress falls, per word
+// explanation: human-readable explanation
+// ===========================================================
+const questions = {
+  1: [
+    { q:"1. A. sewage  B. simple  C. hobby  D. describe", opts:["sewage","simple","hobby","describe"], phonetics:["/ˈsuːɪdʒ/","/ˈsɪmpl/","/ˈhɒbi/","/dɪˈskraɪb/"], stress:["1st","1st","1st","2nd"], answer:3, explain:"Các từ A, B, C đều nhấn âm thứ <strong>nhất</strong>. Từ D <strong>describe</strong> nhấn âm thứ <strong>hai</strong>." },
+    { q:"2. A. dancer  B. cycling  C. balloon  D. traffic", opts:["dancer","cycling","balloon","traffic"], phonetics:["/ˈdɑːnsə/","/ˈsaɪklɪŋ/","/bəˈluːn/","/ˈtræfɪk/"], stress:["1st","1st","2nd","1st"], answer:2, explain:"Các từ A, B, D đều nhấn âm thứ <strong>nhất</strong>. Từ C <strong>balloon</strong> nhấn âm thứ <strong>hai</strong>." },
+    { q:"3. A. promote  B. attract  C. trophy  D. compete", opts:["promote","attract","trophy","compete"], phonetics:["/prəˈməʊt/","/əˈtrækt/","/ˈtrəʊfi/","/kəmˈpiːt/"], stress:["2nd","2nd","1st","2nd"], answer:2, explain:"Các từ A, B, D đều nhấn âm thứ <strong>hai</strong>. Từ C <strong>trophy</strong> nhấn âm thứ <strong>nhất</strong>." },
+    { q:"4. A. develop  B. introduce  C. discover  D. prepare", opts:["develop","introduce","discover","prepare"], phonetics:["/dɪˈveləp/","/ˌɪntrəˈdjuːs/","/dɪˈskʌvə/","/prɪˈpeə/"], stress:["2nd","3rd","2nd","2nd"], answer:1, explain:"Các từ A, C, D đều nhấn âm thứ <strong>hai</strong>. Từ B <strong>introduce</strong> nhấn âm thứ <strong>ba</strong>." },
+    { q:"5. A. celebrate  B. consider  C. expression  D. criteria", opts:["celebrate","consider","expression","criteria"], phonetics:["/ˈselɪbreɪt/","/kənˈsɪdə/","/ɪkˈspreʃn/","/kraɪˈtɪəriə/"], stress:["1st","2nd","2nd","2nd"], answer:0, explain:"Các từ B, C, D đều nhấn âm thứ <strong>hai</strong>. Từ A <strong>celebrate</strong> nhấn âm thứ <strong>nhất</strong>." },
+    { q:"6. A. partner  B. between  C. visit  D. program", opts:["partner","between","visit","program"], phonetics:["/ˈpɑːtnə/","/bɪˈtwiːn/","/ˈvɪzɪt/","/ˈprəʊɡræm/"], stress:["1st","2nd","1st","1st"], answer:1, explain:"Các từ A, C, D đều nhấn âm thứ <strong>nhất</strong>. Từ B <strong>between</strong> nhấn âm thứ <strong>hai</strong>." },
+    { q:"7. A. celebrate  B. consider  C. expression  D. criteria", opts:["celebrate","consider","expression","criteria"], phonetics:["/ˈselɪbreɪt/","/kənˈsɪdə/","/ɪkˈspreʃn/","/kraɪˈtɪəriə/"], stress:["1st","2nd","2nd","2nd"], answer:0, explain:"Các từ B, C, D đều nhấn âm thứ <strong>hai</strong>. Từ A <strong>celebrate</strong> nhấn âm thứ <strong>nhất</strong>." },
+    { q:"8. A. partner  B. between  C. visit  D. program", opts:["partner","between","visit","program"], phonetics:["/ˈpɑːtnə/","/bɪˈtwiːn/","/ˈvɪzɪt/","/ˈprəʊɡræm/"], stress:["1st","2nd","1st","1st"], answer:1, explain:"Các từ A, C, D đều nhấn âm thứ <strong>nhất</strong>. Từ B <strong>between</strong> nhấn âm thứ <strong>hai</strong>." },
+    { q:"9. A. sewage  B. simple  C. hobby  D. describe", opts:["sewage","simple","hobby","describe"], phonetics:["/ˈsuːɪdʒ/","/ˈsɪmpl/","/ˈhɒbi/","/dɪˈskraɪb/"], stress:["1st","1st","1st","2nd"], answer:3, explain:"Các từ A, B, C đều nhấn âm thứ <strong>nhất</strong>. Từ D <strong>describe</strong> nhấn âm thứ <strong>hai</strong>." },
+    { q:"10. A. dancer  B. cycling  C. balloon  D. traffic", opts:["dancer","cycling","balloon","traffic"], phonetics:["/ˈdɑːnsə/","/ˈsaɪklɪŋ/","/bəˈluːn/","/ˈtræfɪk/"], stress:["1st","1st","2nd","1st"], answer:2, explain:"Các từ A, B, D đều nhấn âm thứ <strong>nhất</strong>. Từ C <strong>balloon</strong> nhấn âm thứ <strong>hai</strong>." },
+    { q:"11. A. tutor  B. highlight  C. lunar  D. enroll", opts:["tutor","highlight","lunar","enroll"], phonetics:["/ˈtjuːtə/","/ˈhaɪlaɪt/","/ˈluːnə/","/ɪnˈrəʊl/"], stress:["1st","1st","1st","2nd"], answer:3, explain:"Các từ A, B, C đều nhấn âm thứ <strong>nhất</strong>. Từ D <strong>enroll</strong> nhấn âm thứ <strong>hai</strong>." },
+    { q:"12. A. selection  B. national  C. recycle  D. convenient", opts:["selection","national","recycle","convenient"], phonetics:["/sɪˈlekʃn/","/ˈnæʃənl/","/rɪˈsaɪkl/","/kənˈviːniənt/"], stress:["2nd","1st","2nd","2nd"], answer:1, explain:"Các từ A, C, D đều nhấn âm thứ <strong>hai</strong>. Từ B <strong>national</strong> nhấn âm thứ <strong>nhất</strong>." },
+    { q:"13. A. nation  B. happy  C. comic  D. decide", opts:["nation","happy","comic","decide"], phonetics:["/ˈneɪʃn/","/ˈhæpi/","/ˈkɒmɪk/","/dɪˈsaɪd/"], stress:["1st","1st","1st","2nd"], answer:3, explain:"Các từ A, B, C đều nhấn âm thứ <strong>nhất</strong>. Từ D <strong>decide</strong> nhấn âm thứ <strong>hai</strong>." },
+    { q:"14. A. cover  B. study  C. polite  D. publish", opts:["cover","study","polite","publish"], phonetics:["/ˈkʌvə/","/ˈstʌdi/","/pəˈlaɪt/","/ˈpʌblɪʃ/"], stress:["1st","1st","2nd","1st"], answer:2, explain:"Các từ A, B, D đều nhấn âm thứ <strong>nhất</strong>. Từ C <strong>polite</strong> nhấn âm thứ <strong>hai</strong>." },
+    { q:"15. A. nation  B. design  C. moment  D. comfort", opts:["nation","design","moment","comfort"], phonetics:["/ˈneɪʃn/","/dɪˈzaɪn/","/ˈməʊmənt/","/ˈkʌmfət/"], stress:["1st","2nd","1st","1st"], answer:1, explain:"Các từ A, C, D đều nhấn âm thứ <strong>nhất</strong>. Từ B <strong>design</strong> nhấn âm thứ <strong>hai</strong>." },
+    { q:"16. A. pencil  B. forget  C. enjoy  D. begin", opts:["pencil","forget","enjoy","begin"], phonetics:["/ˈpensl/","/fəˈɡet/","/ɪnˈdʒɔɪ/","/bɪˈɡɪn/"], stress:["1st","2nd","2nd","2nd"], answer:0, explain:"Các từ B, C, D đều nhấn âm thứ <strong>hai</strong>. Từ A <strong>pencil</strong> nhấn âm thứ <strong>nhất</strong>." },
+    { q:"17. A. action  B. affect  C. rapid  D. weather", opts:["action","affect","rapid","weather"], phonetics:["/ˈækʃn/","/əˈfekt/","/ˈræpɪd/","/ˈweðə/"], stress:["1st","2nd","1st","1st"], answer:1, explain:"Các từ A, C, D đều nhấn âm thứ <strong>nhất</strong>. Từ B <strong>affect</strong> nhấn âm thứ <strong>hai</strong>." },
+    { q:"18. A. major  B. public  C. teammate  D. suggest", opts:["major","public","teammate","suggest"], phonetics:["/ˈmeɪdʒə/","/ˈpʌblɪk/","/ˈtiːmmeɪt/","/səˈdʒest/"], stress:["1st","1st","1st","2nd"], answer:3, explain:"Các từ A, B, C đều nhấn âm thứ <strong>nhất</strong>. Từ D <strong>suggest</strong> nhấn âm thứ <strong>hai</strong>." },
+    { q:"19. A. volcano  B. hurricane  C. pesticide  D. animal", opts:["volcano","hurricane","pesticide","animal"], phonetics:["/vɒlˈkeɪnəʊ/","/ˈhʌrɪkeɪn/","/ˈpestɪsaɪd/","/ˈænɪməl/"], stress:["2nd","1st","1st","1st"], answer:0, explain:"Các từ B, C, D đều nhấn âm thứ <strong>nhất</strong>. Từ A <strong>volcano</strong> nhấn âm thứ <strong>hai</strong>." },
+    { q:"20. A. label  B. faucet  C. install  D. model", opts:["label","faucet","install","model"], phonetics:["/ˈleɪbl/","/ˈfɔːsɪt/","/ɪnˈstɔːl/","/ˈmɒdl/"], stress:["1st","1st","2nd","1st"], answer:2, explain:"Các từ A, B, D đều nhấn âm thứ <strong>nhất</strong>. Từ C <strong>install</strong> nhấn âm thứ <strong>hai</strong>." },
+  ],
+  2: [
+    { q:"21. A. money  B. student  C. music  D. enjoy", opts:["money","student","music","enjoy"], phonetics:["/ˈmʌni/","/ˈstjuːdənt/","/ˈmjuːzɪk/","/ɪnˈdʒɔɪ/"], stress:["1st","1st","1st","2nd"], answer:3, explain:"Các từ A, B, C đều nhấn âm thứ <strong>nhất</strong>. Từ D <strong>enjoy</strong> nhấn âm thứ <strong>hai</strong>." },
+    { q:"22. A. nation  B. mention  C. federation  D. option", opts:["nation","mention","federation","option"], phonetics:["/ˈneɪʃn/","/ˈmenʃn/","/ˌfedəˈreɪʃn/","/ˈɒpʃn/"], stress:["1st","1st","3rd","1st"], answer:2, explain:"Các từ A, B, D đều nhấn âm thứ <strong>nhất</strong>. Từ C <strong>federation</strong> nhấn âm thứ <strong>ba</strong>." },
+    { q:"23. A. purpose  B. remote  C. control  D. respond", opts:["purpose","remote","control","respond"], phonetics:["/ˈpɜːpəs/","/rɪˈməʊt/","/kənˈtrəʊl/","/rɪˈspɒnd/"], stress:["1st","2nd","2nd","2nd"], answer:0, explain:"Các từ B, C, D đều nhấn âm thứ <strong>hai</strong>. Từ A <strong>purpose</strong> nhấn âm thứ <strong>nhất</strong>." },
+    { q:"24. A. lesson  B. delay  C. wonder  D. pencil", opts:["lesson","delay","wonder","pencil"], phonetics:["/ˈlesn/","/dɪˈleɪ/","/ˈwʌndə/","/ˈpensl/"], stress:["1st","2nd","1st","1st"], answer:1, explain:"Các từ A, C, D đều nhấn âm thứ <strong>nhất</strong>. Từ B <strong>delay</strong> nhấn âm thứ <strong>hai</strong>." },
+    { q:"25. A. computer  B. obvious  C. dependent  D. acquaintance", opts:["computer","obvious","dependent","acquaintance"], phonetics:["/kəmˈpjuːtə/","/ˈɒbviəs/","/dɪˈpendənt/","/əˈkweɪntəns/"], stress:["2nd","1st","2nd","2nd"], answer:1, explain:"Các từ A, C, D đều nhấn âm thứ <strong>hai</strong>. Từ B <strong>obvious</strong> nhấn âm thứ <strong>nhất</strong>." },
+    { q:"26. A. begin  B. village  C. column  D. ancient", opts:["begin","village","column","ancient"], phonetics:["/bɪˈɡɪn/","/ˈvɪlɪdʒ/","/ˈkɒləm/","/ˈeɪnʃənt/"], stress:["2nd","1st","1st","1st"], answer:0, explain:"Các từ B, C, D đều nhấn âm thứ <strong>nhất</strong>. Từ A <strong>begin</strong> nhấn âm thứ <strong>hai</strong>." },
+    { q:"27. A. deposit  B. festival  C. institute  D. resident", opts:["deposit","festival","institute","resident"], phonetics:["/dɪˈpɒzɪt/","/ˈfestɪvl/","/ˈɪnstɪtjuːt/","/ˈrezɪdənt/"], stress:["2nd","1st","1st","1st"], answer:0, explain:"Các từ B, C, D đều nhấn âm thứ <strong>nhất</strong>. Từ A <strong>deposit</strong> nhấn âm thứ <strong>hai</strong>." },
+    { q:"28. A. surprising  B. astonishing  C. amazing  D. interesting", opts:["surprising","astonishing","amazing","interesting"], phonetics:["/səˈpraɪzɪŋ/","/əˈstɒnɪʃɪŋ/","/əˈmeɪzɪŋ/","/ˈɪntrəstɪŋ/"], stress:["2nd","2nd","2nd","1st"], answer:3, explain:"Các từ A, B, C đều nhấn âm thứ <strong>hai</strong>. Từ D <strong>interesting</strong> nhấn âm thứ <strong>nhất</strong>." },
+    { q:"29. A. interview  B. industry  C. essential  D. difficult", opts:["interview","industry","essential","difficult"], phonetics:["/ˈɪntəvjuː/","/ˈɪndəstri/","/ɪˈsenʃl/","/ˈdɪfɪkəlt/"], stress:["1st","1st","2nd","1st"], answer:2, explain:"Các từ A, B, D đều nhấn âm thứ <strong>nhất</strong>. Từ C <strong>essential</strong> nhấn âm thứ <strong>hai</strong>." },
+    { q:"30. A. extreme  B. generous  C. lonely  D. clothing", opts:["extreme","generous","lonely","clothing"], phonetics:["/ɪkˈstriːm/","/ˈdʒenərəs/","/ˈləʊnli/","/ˈkləʊðɪŋ/"], stress:["2nd","1st","1st","1st"], answer:0, explain:"Các từ B, C, D đều nhấn âm thứ <strong>nhất</strong>. Từ A <strong>extreme</strong> nhấn âm thứ <strong>hai</strong>." },
+    { q:"31. A. surprising  B. astonishing  C. amazing  D. interesting", opts:["surprising","astonishing","amazing","interesting"], phonetics:["/səˈpraɪzɪŋ/","/əˈstɒnɪʃɪŋ/","/əˈmeɪzɪŋ/","/ˈɪntrəstɪŋ/"], stress:["2nd","2nd","2nd","1st"], answer:3, explain:"Các từ A, B, C đều nhấn âm thứ <strong>hai</strong>. Từ D <strong>interesting</strong> nhấn âm thứ <strong>nhất</strong>." },
+    { q:"32. A. friendly  B. extra  C. along  D. orphanage", opts:["friendly","extra","along","orphanage"], phonetics:["/ˈfrendli/","/ˈekstrə/","/əˈlɒŋ/","/ˈɔːfənɪdʒ/"], stress:["1st","1st","2nd","1st"], answer:2, explain:"Các từ A, B, D đều nhấn âm thứ <strong>nhất</strong>. Từ C <strong>along</strong> nhấn âm thứ <strong>hai</strong>." },
+    { q:"33. A. exist  B. avoid  C. support  D. notice", opts:["exist","avoid","support","notice"], phonetics:["/ɪɡˈzɪst/","/əˈvɔɪd/","/səˈpɔːt/","/ˈnəʊtɪs/"], stress:["2nd","2nd","2nd","1st"], answer:3, explain:"Các từ A, B, C đều nhấn âm thứ <strong>hai</strong>. Từ D <strong>notice</strong> nhấn âm thứ <strong>nhất</strong>." },
+    { q:"34. A. hungry  B. disease  C. spacious  D. danger", opts:["hungry","disease","spacious","danger"], phonetics:["/ˈhʌŋɡri/","/dɪˈziːz/","/ˈspeɪʃəs/","/ˈdeɪndʒə/"], stress:["1st","2nd","1st","1st"], answer:1, explain:"Các từ A, C, D đều nhấn âm thứ <strong>nhất</strong>. Từ B <strong>disease</strong> nhấn âm thứ <strong>hai</strong>." },
+    { q:"35. A. energy  B. plentiful  C. disappear  D. celebrate", opts:["energy","plentiful","disappear","celebrate"], phonetics:["/ˈenədʒi/","/ˈplentɪfl/","/ˌdɪsəˈpɪə/","/ˈselɪbreɪt/"], stress:["1st","1st","3rd","1st"], answer:2, explain:"Các từ A, B, D đều nhấn âm thứ <strong>nhất</strong>. Từ C <strong>disappear</strong> nhấn âm thứ <strong>ba</strong>." },
+    { q:"36. A. recycle  B. description  C. contribute  D. atmosphere", opts:["recycle","description","contribute","atmosphere"], phonetics:["/rɪˈsaɪkl/","/dɪˈskrɪpʃn/","/kənˈtrɪbjuːt/","/ˈætməsfɪə/"], stress:["2nd","2nd","2nd","1st"], answer:3, explain:"Các từ A, B, C đều nhấn âm thứ <strong>hai</strong>. Từ D <strong>atmosphere</strong> nhấn âm thứ <strong>nhất</strong>." },
+    { q:"37. A. dancer  B. cycling  C. balloon  D. traffic", opts:["dancer","cycling","balloon","traffic"], phonetics:["/ˈdɑːnsə/","/ˈsaɪklɪŋ/","/bəˈluːn/","/ˈtræfɪk/"], stress:["1st","1st","2nd","1st"], answer:2, explain:"Các từ A, B, D đều nhấn âm thứ <strong>nhất</strong>. Từ C <strong>balloon</strong> nhấn âm thứ <strong>hai</strong>." },
+    { q:"38. A. sewage  B. simple  C. hobby  D. describe", opts:["sewage","simple","hobby","describe"], phonetics:["/ˈsuːɪdʒ/","/ˈsɪmpl/","/ˈhɒbi/","/dɪˈskraɪb/"], stress:["1st","1st","1st","2nd"], answer:3, explain:"Các từ A, B, C đều nhấn âm thứ <strong>nhất</strong>. Từ D <strong>describe</strong> nhấn âm thứ <strong>hai</strong>." },
+    { q:"39. A. emigrate  B. Atlantic  C. criteria  D. policeman", opts:["emigrate","Atlantic","criteria","policeman"], phonetics:["/ˈemɪɡreɪt/","/ətˈlæntɪk/","/kraɪˈtɪəriə/","/pəˈliːsmən/"], stress:["1st","2nd","2nd","2nd"], answer:0, explain:"Các từ B, C, D đều nhấn âm thứ <strong>hai</strong>. Từ A <strong>emigrate</strong> nhấn âm thứ <strong>nhất</strong>." },
+    { q:"40. A. facilities  B. particular  C. inhabitant  D. governmental", opts:["facilities","particular","inhabitant","governmental"], phonetics:["/fəˈsɪlɪtiz/","/pəˈtɪkjʊlə/","/ɪnˈhæbɪtənt/","/ˌɡʌvənˈmentl/"], stress:["2nd","2nd","2nd","3rd"], answer:3, explain:"Các từ A, B, C đều nhấn âm thứ <strong>hai</strong>. Từ D <strong>governmental</strong> nhấn âm thứ <strong>ba</strong>." },
+  ],
+  3: [
+    { q:"41. A. familiar  B. uncertainty  C. impatient  D. arrogantly", opts:["familiar","uncertainty","impatient","arrogantly"], phonetics:["/fəˈmɪliə/","/ʌnˈsɜːtnti/","/ɪmˈpeɪʃnt/","/ˈærəɡəntli/"], stress:["2nd","2nd","2nd","1st"], answer:3, explain:"Các từ A, B, C đều nhấn âm thứ <strong>hai</strong>. Từ D <strong>arrogantly</strong> nhấn âm thứ <strong>nhất</strong>." },
+    { q:"42. A. affectionate  B. kindergarten  C. respectable  D. occasional", opts:["affectionate","kindergarten","respectable","occasional"], phonetics:["/əˈfekʃənət/","/ˈkɪndəɡɑːtən/","/rɪˈspektəbl/","/əˈkeɪʒənl/"], stress:["2nd","1st","2nd","2nd"], answer:1, explain:"Các từ A, C, D đều nhấn âm thứ <strong>hai</strong>. Từ B <strong>kindergarten</strong> nhấn âm thứ <strong>nhất</strong>." },
+    { q:"43. A. cover  B. account  C. install  D. prevent", opts:["cover","account","install","prevent"], phonetics:["/ˈkʌvə/","/əˈkaʊnt/","/ɪnˈstɔːl/","/prɪˈvent/"], stress:["1st","2nd","2nd","2nd"], answer:0, explain:"Các từ B, C, D đều nhấn âm thứ <strong>hai</strong>. Từ A <strong>cover</strong> nhấn âm thứ <strong>nhất</strong>." },
+    { q:"44. A. questionnaire  B. recommend  C. introduce  D. concentrate", opts:["questionnaire","recommend","introduce","concentrate"], phonetics:["/ˌkwestʃəˈneə/","/ˌrekəˈmend/","/ˌɪntrəˈdjuːs/","/ˈkɒnsntreɪt/"], stress:["3rd","3rd","3rd","1st"], answer:3, explain:"Các từ A, B, C đều nhấn âm thứ <strong>ba</strong>. Từ D <strong>concentrate</strong> nhấn âm thứ <strong>nhất</strong>." },
+    { q:"45. A. interview  B. determine  C. interpret  D. equipment", opts:["interview","determine","interpret","equipment"], phonetics:["/ˈɪntəvjuː/","/dɪˈtɜːmɪn/","/ɪnˈtɜːprɪt/","/ɪˈkwɪpmənt/"], stress:["1st","2nd","2nd","2nd"], answer:0, explain:"Các từ B, C, D đều nhấn âm thứ <strong>hai</strong>. Từ A <strong>interview</strong> nhấn âm thứ <strong>nhất</strong>." },
+    { q:"46. A. emigrate  B. Atlantic  C. criteria  D. policeman", opts:["emigrate","Atlantic","criteria","policeman"], phonetics:["/ˈemɪɡreɪt/","/ətˈlæntɪk/","/kraɪˈtɪəriə/","/pəˈliːsmən/"], stress:["1st","2nd","2nd","2nd"], answer:0, explain:"Các từ B, C, D đều nhấn âm thứ <strong>hai</strong>. Từ A <strong>emigrate</strong> nhấn âm thứ <strong>nhất</strong>." },
+    { q:"47. A. prepare  B. agree  C. await  D. borrow", opts:["prepare","agree","await","borrow"], phonetics:["/prɪˈpeə/","/əˈɡriː/","/əˈweɪt/","/ˈbɒrəʊ/"], stress:["2nd","2nd","2nd","1st"], answer:3, explain:"Các từ A, B, C đều nhấn âm thứ <strong>hai</strong>. Từ D <strong>borrow</strong> nhấn âm thứ <strong>nhất</strong>." },
+    { q:"48. A. destroy  B. happen  C. standard  D. handsome", opts:["destroy","happen","standard","handsome"], phonetics:["/dɪˈstrɔɪ/","/ˈhæpən/","/ˈstændəd/","/ˈhænsəm/"], stress:["2nd","1st","1st","1st"], answer:0, explain:"Các từ B, C, D đều nhấn âm thứ <strong>nhất</strong>. Từ A <strong>destroy</strong> nhấn âm thứ <strong>hai</strong>." },
+    { q:"49. A. inspiration  B. collection  C. reputation  D. limitation", opts:["inspiration","collection","reputation","limitation"], phonetics:["/ˌɪnspɪˈreɪʃn/","/kəˈlekʃn/","/ˌrepjʊˈteɪʃn/","/ˌlɪmɪˈteɪʃn/"], stress:["3rd","2nd","3rd","3rd"], answer:1, explain:"Các từ A, C, D đều nhấn âm thứ <strong>ba</strong>. Từ B <strong>collection</strong> nhấn âm thứ <strong>hai</strong>." },
+    { q:"50. A. objection  B. opinion  C. official  D. optional", opts:["objection","opinion","official","optional"], phonetics:["/əbˈdʒekʃn/","/əˈpɪniən/","/əˈfɪʃl/","/ˈɒpʃənl/"], stress:["2nd","2nd","2nd","1st"], answer:3, explain:"Các từ A, B, C đều nhấn âm thứ <strong>hai</strong>. Từ D <strong>optional</strong> nhấn âm thứ <strong>nhất</strong>." },
+    { q:"51. A. remove  B. cancel  C. copy  D. answer", opts:["remove","cancel","copy","answer"], phonetics:["/rɪˈmuːv/","/ˈkænsl/","/ˈkɒpi/","/ˈɑːnsə/"], stress:["2nd","1st","1st","1st"], answer:0, explain:"Các từ B, C, D đều nhấn âm thứ <strong>nhất</strong>. Từ A <strong>remove</strong> nhấn âm thứ <strong>hai</strong>." },
+    { q:"52. A. inspiration  B. collection  C. reputation  D. limitation", opts:["inspiration","collection","reputation","limitation"], phonetics:["/ˌɪnspɪˈreɪʃn/","/kəˈlekʃn/","/ˌrepjʊˈteɪʃn/","/ˌlɪmɪˈteɪʃn/"], stress:["3rd","2nd","3rd","3rd"], answer:1, explain:"Các từ A, C, D đều nhấn âm thứ <strong>ba</strong>. Từ B <strong>collection</strong> nhấn âm thứ <strong>hai</strong>." },
+    { q:"53. A. cover  B. account  C. install  D. prevent", opts:["cover","account","install","prevent"], phonetics:["/ˈkʌvə/","/əˈkaʊnt/","/ɪnˈstɔːl/","/prɪˈvent/"], stress:["1st","2nd","2nd","2nd"], answer:0, explain:"Các từ B, C, D đều nhấn âm thứ <strong>hai</strong>. Từ A <strong>cover</strong> nhấn âm thứ <strong>nhất</strong>." },
+    { q:"54. A. questionnaire  B. recommend  C. introduce  D. concentrate", opts:["questionnaire","recommend","introduce","concentrate"], phonetics:["/ˌkwestʃəˈneə/","/ˌrekəˈmend/","/ˌɪntrəˈdjuːs/","/ˈkɒnsntreɪt/"], stress:["3rd","3rd","3rd","1st"], answer:3, explain:"Các từ A, B, C đều nhấn âm thứ <strong>ba</strong>. Từ D <strong>concentrate</strong> nhấn âm thứ <strong>nhất</strong>." },
+    { q:"55. A. inspiration  B. collection  C. reputation  D. limitation", opts:["inspiration","collection","reputation","limitation"], phonetics:["/ˌɪnspɪˈreɪʃn/","/kəˈlekʃn/","/ˌrepjʊˈteɪʃn/","/ˌlɪmɪˈteɪʃn/"], stress:["3rd","2nd","3rd","3rd"], answer:1, explain:"Các từ A, C, D đều nhấn âm thứ <strong>ba</strong>. Từ B <strong>collection</strong> nhấn âm thứ <strong>hai</strong>." },
+    { q:"56. A. career  B. idea  C. effort  D. result", opts:["career","idea","effort","result"], phonetics:["/kəˈrɪə/","/aɪˈdɪə/","/ˈefət/","/rɪˈzʌlt/"], stress:["2nd","2nd","1st","2nd"], answer:2, explain:"Các từ A, B, D đều nhấn âm thứ <strong>hai</strong>. Từ C <strong>effort</strong> nhấn âm thứ <strong>nhất</strong>." },
+    { q:"57. A. attract  B. level  C. destroy  D. occur", opts:["attract","level","destroy","occur"], phonetics:["/əˈtrækt/","/ˈlevl/","/dɪˈstrɔɪ/","/əˈkɜː/"], stress:["2nd","1st","2nd","2nd"], answer:1, explain:"Các từ A, C, D đều nhấn âm thứ <strong>hai</strong>. Từ B <strong>level</strong> nhấn âm thứ <strong>nhất</strong>." },
+    { q:"58. A. reputation  B. description  C. suggestion  D. pollution", opts:["reputation","description","suggestion","pollution"], phonetics:["/ˌrepjʊˈteɪʃn/","/dɪˈskrɪpʃn/","/səˈdʒestʃən/","/pəˈluːʃn/"], stress:["3rd","2nd","2nd","2nd"], answer:0, explain:"Các từ B, C, D đều nhấn âm thứ <strong>hai</strong>. Từ A <strong>reputation</strong> nhấn âm thứ <strong>ba</strong>." },
+    { q:"59. A. occasion  B. pagoda  C. embroider  D. comfortable", opts:["occasion","pagoda","embroider","comfortable"], phonetics:["/əˈkeɪʒn/","/pəˈɡəʊdə/","/ɪmˈbrɔɪdə/","/ˈkʌmftəbl/"], stress:["2nd","2nd","2nd","1st"], answer:3, explain:"Các từ A, B, C đều nhấn âm thứ <strong>hai</strong>. Từ D <strong>comfortable</strong> nhấn âm thứ <strong>nhất</strong>." },
+    { q:"60. A. business  B. departure  C. arrival  D. convenient", opts:["business","departure","arrival","convenient"], phonetics:["/ˈbɪznəs/","/dɪˈpɑːtʃə/","/əˈraɪvl/","/kənˈviːniənt/"], stress:["1st","2nd","2nd","2nd"], answer:0, explain:"Các từ B, C, D đều nhấn âm thứ <strong>hai</strong>. Từ A <strong>business</strong> nhấn âm thứ <strong>nhất</strong>." },
+  ],
+  4: [
+    { q:"61. A. family  B. disaster  C. buffalo  D. several", opts:["family","disaster","buffalo","several"], phonetics:["/ˈfæməli/","/dɪˈzɑːstə/","/ˈbʌfələʊ/","/ˈsevrəl/"], stress:["1st","2nd","1st","1st"], answer:1, explain:"Các từ A, C, D đều nhấn âm thứ <strong>nhất</strong>. Từ B <strong>disaster</strong> nhấn âm thứ <strong>hai</strong>." },
+    { q:"62. A. country  B. cousin  C. polite  D. borrow", opts:["country","cousin","polite","borrow"], phonetics:["/ˈkʌntri/","/ˈkʌzn/","/pəˈlaɪt/","/ˈbɒrəʊ/"], stress:["1st","1st","2nd","1st"], answer:2, explain:"Các từ A, B, D đều nhấn âm thứ <strong>nhất</strong>. Từ C <strong>polite</strong> nhấn âm thứ <strong>hai</strong>." },
+    { q:"63. A. family  B. disaster  C. buffalo  D. several", opts:["family","disaster","buffalo","several"], phonetics:["/ˈfæməli/","/dɪˈzɑːstə/","/ˈbʌfələʊ/","/ˈsevrəl/"], stress:["1st","2nd","1st","1st"], answer:1, explain:"Các từ A, C, D đều nhấn âm thứ <strong>nhất</strong>. Từ B <strong>disaster</strong> nhấn âm thứ <strong>hai</strong>." },
+    { q:"64. A. country  B. cousin  C. polite  D. borrow", opts:["country","cousin","polite","borrow"], phonetics:["/ˈkʌntri/","/ˈkʌzn/","/pəˈlaɪt/","/ˈbɒrəʊ/"], stress:["1st","1st","2nd","1st"], answer:2, explain:"Các từ A, B, D đều nhấn âm thứ <strong>nhất</strong>. Từ C <strong>polite</strong> nhấn âm thứ <strong>hai</strong>." },
+    { q:"65. A. earthquake  B. energy  C. experience  D. exercise", opts:["earthquake","energy","experience","exercise"], phonetics:["/ˈɜːθkweɪk/","/ˈenədʒi/","/ɪkˈspɪəriəns/","/ˈeksəsaɪz/"], stress:["1st","1st","2nd","1st"], answer:2, explain:"Các từ A, B, D đều nhấn âm thứ <strong>nhất</strong>. Từ C <strong>experience</strong> nhấn âm thứ <strong>hai</strong>." },
+    { q:"66. A. throughout  B. volcanic  C. unpleasant  D. fashionable", opts:["throughout","volcanic","unpleasant","fashionable"], phonetics:["/θruːˈaʊt/","/vɒlˈkænɪk/","/ʌnˈpleznt/","/ˈfæʃnəbl/"], stress:["2nd","2nd","2nd","1st"], answer:3, explain:"Các từ A, B, C đều nhấn âm thứ <strong>hai</strong>. Từ D <strong>fashionable</strong> nhấn âm thứ <strong>nhất</strong>." },
+    { q:"67. A. friendliness  B. occasion  C. pagoda  D. deposit", opts:["friendliness","occasion","pagoda","deposit"], phonetics:["/ˈfrendlinəs/","/əˈkeɪʒn/","/pəˈɡəʊdə/","/dɪˈpɒzɪt/"], stress:["1st","2nd","2nd","2nd"], answer:0, explain:"Các từ B, C, D đều nhấn âm thứ <strong>hai</strong>. Từ A <strong>friendliness</strong> nhấn âm thứ <strong>nhất</strong>." },
+    { q:"68. A. federation  B. unpolluted  C. disappearing  D. profitable", opts:["federation","unpolluted","disappearing","profitable"], phonetics:["/ˌfedəˈreɪʃn/","/ˌʌnpəˈluːtɪd/","/ˌdɪsəˈpɪərɪŋ/","/ˈprɒfɪtəbl/"], stress:["3rd","3rd","3rd","1st"], answer:3, explain:"Các từ A, B, C đều nhấn âm thứ <strong>ba</strong>. Từ D <strong>profitable</strong> nhấn âm thứ <strong>nhất</strong>." },
+    { q:"69. A. historic  B. pollution  C. aquatic  D. examinee", opts:["historic","pollution","aquatic","examinee"], phonetics:["/hɪˈstɒrɪk/","/pəˈluːʃn/","/əˈkwætɪk/","/ɪɡˌzæmɪˈniː/"], stress:["2nd","2nd","2nd","3rd"], answer:3, explain:"Các từ A, B, C đều nhấn âm thứ <strong>hai</strong>. Từ D <strong>examinee</strong> nhấn âm thứ <strong>ba</strong>." },
+    { q:"70. A. possibility  B. competitive  C. production  D. typhoon", opts:["possibility","competitive","production","typhoon"], phonetics:["/ˌpɒsəˈbɪlɪti/","/kəmˈpetɪtɪv/","/prəˈdʌkʃn/","/taɪˈfuːn/"], stress:["4th","2nd","2nd","2nd"], answer:0, explain:"Các từ B, C, D đều nhấn âm thứ <strong>hai</strong>. Từ A <strong>possibility</strong> nhấn âm thứ <strong>tư</strong>." },
+    { q:"71. A. action  B. affect  C. rapid  D. weather", opts:["action","affect","rapid","weather"], phonetics:["/ˈækʃn/","/əˈfekt/","/ˈræpɪd/","/ˈweðə/"], stress:["1st","2nd","1st","1st"], answer:1, explain:"Các từ A, C, D đều nhấn âm thứ <strong>nhất</strong>. Từ B <strong>affect</strong> nhấn âm thứ <strong>hai</strong>." },
+    { q:"72. A. major  B. public  C. teammate  D. suggest", opts:["major","public","teammate","suggest"], phonetics:["/ˈmeɪdʒə/","/ˈpʌblɪk/","/ˈtiːmmeɪt/","/səˈdʒest/"], stress:["1st","1st","1st","2nd"], answer:3, explain:"Các từ A, B, C đều nhấn âm thứ <strong>nhất</strong>. Từ D <strong>suggest</strong> nhấn âm thứ <strong>hai</strong>." },
+    { q:"73. A. climate  B. comprise  C. notice  D. casual", opts:["climate","comprise","notice","casual"], phonetics:["/ˈklaɪmɪt/","/kəmˈpraɪz/","/ˈnəʊtɪs/","/ˈkæʒuəl/"], stress:["1st","2nd","1st","1st"], answer:1, explain:"Các từ A, C, D đều nhấn âm thứ <strong>nhất</strong>. Từ B <strong>comprise</strong> nhấn âm thứ <strong>hai</strong>." },
+    { q:"74. A. edition  B. deposit  C. separate  D. collection", opts:["edition","deposit","separate","collection"], phonetics:["/ɪˈdɪʃn/","/dɪˈpɒzɪt/","/ˈseprət/","/kəˈlekʃn/"], stress:["2nd","2nd","1st","2nd"], answer:2, explain:"Các từ A, B, D đều nhấn âm thứ <strong>hai</strong>. Từ C <strong>separate</strong> nhấn âm thứ <strong>nhất</strong>." },
+    { q:"75. A. respect  B. marry  C. depend  D. predict", opts:["respect","marry","depend","predict"], phonetics:["/rɪˈspekt/","/ˈmæri/","/dɪˈpend/","/prɪˈdɪkt/"], stress:["2nd","1st","2nd","2nd"], answer:1, explain:"Các từ A, C, D đều nhấn âm thứ <strong>hai</strong>. Từ B <strong>marry</strong> nhấn âm thứ <strong>nhất</strong>." },
+    { q:"76. A. fantastic  B. powerful  C. sensitive  D. personal", opts:["fantastic","powerful","sensitive","personal"], phonetics:["/fænˈtæstɪk/","/ˈpaʊəfl/","/ˈsensɪtɪv/","/ˈpɜːsənl/"], stress:["2nd","1st","1st","1st"], answer:0, explain:"Các từ B, C, D đều nhấn âm thứ <strong>nhất</strong>. Từ A <strong>fantastic</strong> nhấn âm thứ <strong>hai</strong>." },
+    { q:"77. A. cover  B. pollute  C. hobby  D. model", opts:["cover","pollute","hobby","model"], phonetics:["/ˈkʌvə/","/pəˈluːt/","/ˈhɒbi/","/ˈmɒdl/"], stress:["1st","2nd","1st","1st"], answer:1, explain:"Các từ A, C, D đều nhấn âm thứ <strong>nhất</strong>. Từ B <strong>pollute</strong> nhấn âm thứ <strong>hai</strong>." },
+    { q:"78. A. addition  B. musician  C. confidence  D. occasion", opts:["addition","musician","confidence","occasion"], phonetics:["/əˈdɪʃn/","/mjuːˈzɪʃn/","/ˈkɒnfɪdəns/","/əˈkeɪʒn/"], stress:["2nd","2nd","1st","2nd"], answer:2, explain:"Các từ A, B, D đều nhấn âm thứ <strong>hai</strong>. Từ C <strong>confidence</strong> nhấn âm thứ <strong>nhất</strong>." },
+    { q:"79. A. economic  B. population  C. activity  D. information", opts:["economic","population","activity","information"], phonetics:["/ˌiːkəˈnɒmɪk/","/ˌpɒpjʊˈleɪʃn/","/ækˈtɪvɪti/","/ˌɪnfəˈmeɪʃn/"], stress:["3rd","3rd","2nd","3rd"], answer:2, explain:"Các từ A, B, D đều nhấn âm thứ <strong>ba</strong>. Từ C <strong>activity</strong> nhấn âm thứ <strong>hai</strong>." },
+    { q:"80. A. complete  B. computer  C. electric  D. engineer", opts:["complete","computer","electric","engineer"], phonetics:["/kəmˈpliːt/","/kəmˈpjuːtə/","/ɪˈlektrɪk/","/ˌendʒɪˈnɪə/"], stress:["2nd","2nd","2nd","3rd"], answer:3, explain:"Các từ A, B, C đều nhấn âm thứ <strong>hai</strong>. Từ D <strong>engineer</strong> nhấn âm thứ <strong>ba</strong>." },
+  ],
+  5: [
+    { q:"81. A. handicraft  B. communicate  C. artisan  D. cultivate", opts:["handicraft","communicate","artisan","cultivate"], phonetics:["/ˈhændikrɑːft/","/kəˈmjuːnɪkeɪt/","/ˈɑːtɪzæn/","/ˈkʌltɪveɪt/"], stress:["1st","2nd","1st","1st"], answer:1, explain:"Các từ A, C, D đều nhấn âm thứ <strong>nhất</strong>. Từ B <strong>communicate</strong> nhấn âm thứ <strong>hai</strong>." },
+    { q:"82. A. historical  B. embroidery  C. authority  D. architecture", opts:["historical","embroidery","authority","architecture"], phonetics:["/hɪˈstɒrɪkl/","/ɪmˈbrɔɪdəri/","/ɔːˈθɒrɪti/","/ˈɑːkɪtektʃə/"], stress:["2nd","2nd","2nd","1st"], answer:3, explain:"Các từ A, B, C đều nhấn âm thứ <strong>hai</strong>. Từ D <strong>architecture</strong> nhấn âm thứ <strong>nhất</strong>." },
+    { q:"83. A. destroy  B. attend  C. lesson  D. receive", opts:["destroy","attend","lesson","receive"], phonetics:["/dɪˈstrɔɪ/","/əˈtend/","/ˈlesn/","/rɪˈsiːv/"], stress:["2nd","2nd","1st","2nd"], answer:2, explain:"Các từ A, B, D đều nhấn âm thứ <strong>hai</strong>. Từ C <strong>lesson</strong> nhấn âm thứ <strong>nhất</strong>." },
+    { q:"84. A. disease  B. flower  C. doctor  D. castle", opts:["disease","flower","doctor","castle"], phonetics:["/dɪˈziːz/","/ˈflaʊə/","/ˈdɒktə/","/ˈkɑːsl/"], stress:["2nd","1st","1st","1st"], answer:0, explain:"Các từ B, C, D đều nhấn âm thứ <strong>nhất</strong>. Từ A <strong>disease</strong> nhấn âm thứ <strong>hai</strong>." },
+    { q:"85. A. reflect  B. contain  C. purchase  D. suggest", opts:["reflect","contain","purchase","suggest"], phonetics:["/rɪˈflekt/","/kənˈteɪn/","/ˈpɜːtʃəs/","/səˈdʒest/"], stress:["2nd","2nd","1st","2nd"], answer:2, explain:"Các từ A, B, D đều nhấn âm thứ <strong>hai</strong>. Từ C <strong>purchase</strong> nhấn âm thứ <strong>nhất</strong>." },
+    { q:"86. A. possession  B. politics  C. decision  D. refusal", opts:["possession","politics","decision","refusal"], phonetics:["/pəˈzeʃn/","/ˈpɒlɪtɪks/","/dɪˈsɪʒn/","/rɪˈfjuːzl/"], stress:["2nd","1st","2nd","2nd"], answer:1, explain:"Các từ A, C, D đều nhấn âm thứ <strong>hai</strong>. Từ B <strong>politics</strong> nhấn âm thứ <strong>nhất</strong>." },
+    { q:"87. A. artefact  B. embroider  C. carpentry  D. conical", opts:["artefact","embroider","carpentry","conical"], phonetics:["/ˈɑːtɪfækt/","/ɪmˈbrɔɪdə/","/ˈkɑːpəntri/","/ˈkɒnɪkl/"], stress:["1st","2nd","1st","1st"], answer:1, explain:"Các từ A, C, D đều nhấn âm thứ <strong>nhất</strong>. Từ B <strong>embroider</strong> nhấn âm thứ <strong>hai</strong>." },
+    { q:"88. A. complicated  B. experience  C. prosperity  D. traditional", opts:["complicated","experience","prosperity","traditional"], phonetics:["/ˈkɒmplɪkeɪtɪd/","/ɪkˈspɪəriəns/","/prɒˈsperɪti/","/trəˈdɪʃənl/"], stress:["1st","2nd","2nd","2nd"], answer:0, explain:"Các từ B, C, D đều nhấn âm thứ <strong>hai</strong>. Từ A <strong>complicated</strong> nhấn âm thứ <strong>nhất</strong>." },
+    { q:"89. A. envious  B. astonished  C. suburban  D. defensive", opts:["envious","astonished","suburban","defensive"], phonetics:["/ˈenviəs/","/əˈstɒnɪʃt/","/səˈbɜːbən/","/dɪˈfensɪv/"], stress:["1st","2nd","2nd","2nd"], answer:0, explain:"Các từ B, C, D đều nhấn âm thứ <strong>hai</strong>. Từ A <strong>envious</strong> nhấn âm thứ <strong>nhất</strong>." },
+    { q:"90. A. household  B. tunnel  C. igloo  D. respect", opts:["household","tunnel","igloo","respect"], phonetics:["/ˈhaʊshəʊld/","/ˈtʌnl/","/ˈɪɡluː/","/rɪˈspekt/"], stress:["1st","1st","1st","2nd"], answer:3, explain:"Các từ A, B, C đều nhấn âm thứ <strong>nhất</strong>. Từ D <strong>respect</strong> nhấn âm thứ <strong>hai</strong>." },
+    { q:"91. A. flyover  B. skytrain  C. rubber  D. success", opts:["flyover","skytrain","rubber","success"], phonetics:["/ˈflaɪəʊvə/","/ˈskaɪtreɪn/","/ˈrʌbə/","/səkˈses/"], stress:["1st","1st","1st","2nd"], answer:3, explain:"Các từ A, B, C đều nhấn âm thứ <strong>nhất</strong>. Từ D <strong>success</strong> nhấn âm thứ <strong>hai</strong>." },
+    { q:"92. A. attend  B. agree  C. open  D. express", opts:["attend","agree","open","express"], phonetics:["/əˈtend/","/əˈɡriː/","/ˈəʊpən/","/ɪkˈspres/"], stress:["2nd","2nd","1st","2nd"], answer:2, explain:"Các từ A, B, D đều nhấn âm thứ <strong>hai</strong>. Từ C <strong>open</strong> nhấn âm thứ <strong>nhất</strong>." },
+    { q:"93. A. engineer  B. activity  C. pollution  D. tradition", opts:["engineer","activity","pollution","tradition"], phonetics:["/ˌendʒɪˈnɪə/","/ækˈtɪvɪti/","/pəˈluːʃn/","/trəˈdɪʃn/"], stress:["3rd","2nd","2nd","2nd"], answer:0, explain:"Các từ B, C, D đều nhấn âm thứ <strong>hai</strong>. Từ A <strong>engineer</strong> nhấn âm thứ <strong>ba</strong>." },
+    { q:"94. A. opportunity  B. administrative  C. possibility  D. university", opts:["opportunity","administrative","possibility","university"], phonetics:["/ˌɒpəˈtjuːnɪti/","/ədˈmɪnɪstrətɪv/","/ˌpɒsəˈbɪlɪti/","/ˌjuːnɪˈvɜːsɪti/"], stress:["3rd","2nd","4th","4th"], answer:1, explain:"Các từ A, C, D nhấn vào âm tiết muộn hơn (thứ 3 hoặc 4). Từ B <strong>administrative</strong> nhấn âm thứ <strong>hai</strong>." },
+    { q:"95. A. medium  B. dangerous  C. picturesque  D. obvious", opts:["medium","dangerous","picturesque","obvious"], phonetics:["/ˈmiːdiəm/","/ˈdeɪndʒərəs/","/ˌpɪktʃəˈresk/","/ˈɒbviəs/"], stress:["1st","1st","3rd","1st"], answer:2, explain:"Các từ A, B, D đều nhấn âm thứ <strong>nhất</strong>. Từ C <strong>picturesque</strong> nhấn âm thứ <strong>ba</strong>." },
+    { q:"96. A. centralise  B. achievement  C. combustion  D. diversity", opts:["centralise","achievement","combustion","diversity"], phonetics:["/ˈsentrəlaɪz/","/əˈtʃiːvmənt/","/kəmˈbʌstʃən/","/daɪˈvɜːsɪti/"], stress:["1st","2nd","2nd","2nd"], answer:0, explain:"Các từ B, C, D đều nhấn âm thứ <strong>hai</strong>. Từ A <strong>centralise</strong> nhấn âm thứ <strong>nhất</strong>." },
+    { q:"97. A. relevant  B. assistant  C. argument  D. attitude", opts:["relevant","assistant","argument","attitude"], phonetics:["/ˈreləvənt/","/əˈsɪstənt/","/ˈɑːɡjumənt/","/ˈætɪtjuːd/"], stress:["1st","2nd","1st","1st"], answer:1, explain:"Các từ A, C, D đều nhấn âm thứ <strong>nhất</strong>. Từ B <strong>assistant</strong> nhấn âm thứ <strong>hai</strong>." },
+    { q:"98. A. escape  B. before  C. enough  D. welfare", opts:["escape","before","enough","welfare"], phonetics:["/ɪˈskeɪp/","/bɪˈfɔː/","/ɪˈnʌf/","/ˈwelfeə/"], stress:["2nd","2nd","2nd","1st"], answer:3, explain:"Các từ A, B, C đều nhấn âm thứ <strong>hai</strong>. Từ D <strong>welfare</strong> nhấn âm thứ <strong>nhất</strong>." },
+    { q:"99. A. situation  B. examination  C. generation  D. education", opts:["situation","examination","generation","education"], phonetics:["/ˌsɪtʃuˈeɪʃn/","/ɪɡˌzæmɪˈneɪʃn/","/ˌdʒenəˈreɪʃn/","/ˌedʒuˈkeɪʃn/"], stress:["3rd","4th","3rd","3rd"], answer:1, explain:"Các từ A, C, D đều nhấn âm thứ <strong>ba</strong>. Từ B <strong>examination</strong> nhấn âm thứ <strong>tư</strong>." },
+  ]
+};
+
+// ===========================================================
+// APP STATE
+// ===========================================================
+let currentSet = 1;
+let currentIdx = 0;
+let answered = false;
+let correctCount = 0;
+let wrongCount = 0;
+let shuffledQuestions = [];
+
+const labels = ['A','B','C','D'];
+
+function shuffleArray(arr) {
+  return [...arr].sort(() => Math.random() - 0.5);
+}
+
+function initSet(setNum) {
+  currentSet = setNum;
+  currentIdx = 0;
+  correctCount = 0;
+  wrongCount = 0;
+  answered = false;
+  shuffledQuestions = [...questions[setNum]];
+
+  document.querySelectorAll('.set-btn').forEach(btn => {
+    btn.classList.toggle('active', parseInt(btn.dataset.set) === setNum);
+  });
+  document.getElementById('resultScreen').classList.remove('visible');
+  document.getElementById('quizArea').style.display = '';
+  updateScoreUI();
+  renderQuestion();
+}
+
+function updateScoreUI() {
+  document.getElementById('scoreCorrect').textContent = '✓ ' + correctCount;
+  document.getElementById('scoreWrong').textContent = '✗ ' + wrongCount;
+  const total = shuffledQuestions.length;
+  const pct = total > 0 ? (currentIdx / total) * 100 : 0;
+  document.getElementById('progressBar').style.width = pct + '%';
+  document.getElementById('progressText').textContent = `Câu ${Math.min(currentIdx+1, total)} / ${total}`;
+}
+
+function renderQuestion() {
+  const total = shuffledQuestions.length;
+  if (currentIdx >= total) { showResult(); return; }
+
+  answered = false;
+  const q = shuffledQuestions[currentIdx];
+  updateScoreUI();
+
+  const nextBtn = document.getElementById('nextBtn');
+  nextBtn.classList.remove('visible');
+
+  const container = document.getElementById('questionContainer');
+  container.innerHTML = '';
+
+  const card = document.createElement('div');
+  card.className = 'question-card';
+
+  card.innerHTML = `
+    <div class="q-number">Câu ${currentIdx + 1} / ${total}</div>
+    <div class="q-text">Chọn từ có trọng âm <strong>khác</strong> với các từ còn lại:</div>
+    <div class="options" id="optionsGrid"></div>
+    <div class="explanation" id="explanation" style="display:none"></div>
+  `;
+  container.appendChild(card);
+
+  const grid = card.querySelector('#optionsGrid');
+  q.opts.forEach((word, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'option-btn';
+    btn.innerHTML = `<span class="option-label">${labels[i]}</span><div><span class="option-word">${word}</span></div>`;
+    btn.onclick = () => handleAnswer(i, q, card);
+    grid.appendChild(btn);
+  });
+}
+
+function handleAnswer(chosen, q, card) {
+  if (answered) return;
+  answered = true;
+
+  const buttons = card.querySelectorAll('.option-btn');
+  const isCorrect = chosen === q.answer;
+
+  if (isCorrect) correctCount++;
+  else wrongCount++;
+
+  buttons.forEach((btn, i) => {
+    btn.disabled = true;
+    if (i === q.answer) btn.classList.add('correct');
+    else if (i === chosen && !isCorrect) btn.classList.add('wrong');
+    else btn.classList.add('reveal');
+  });
+
+  // Show explanation
+  const expDiv = card.querySelector('#explanation');
+  expDiv.style.display = 'block';
+
+  let phoneticsHTML = q.opts.map((word, i) => `
+    <div class="phonetic-item${i===q.answer?' is-answer':''}">
+      <span class="ph-label">${labels[i]}${i===q.answer?' ★':''}</span>
+      <span class="ph-word">${word}</span>
+      <span class="ph-ipa">${q.phonetics[i]}</span>
+      <span class="ph-stress">Âm ${q.stress[i]}</span>
+    </div>
+  `).join('');
+
+  expDiv.innerHTML = `
+    <h4>📖 Phiên âm & Trọng âm</h4>
+    <div class="phonetics">${phoneticsHTML}</div>
+    <div class="explanation-text">
+      ${isCorrect ? '✅ <strong>Chính xác!</strong>' : '❌ <strong>Chưa đúng.</strong>'}
+      <span class="answer-tag">Đáp án: ${labels[q.answer]}</span><br>
+      ${q.explain}
+    </div>
+  `;
+
+  document.getElementById('scoreCorrect').textContent = '✓ ' + correctCount;
+  document.getElementById('scoreWrong').textContent = '✗ ' + wrongCount;
+  document.getElementById('nextBtn').classList.add('visible');
+  
+  // Update progress
+  const total = shuffledQuestions.length;
+  const pct = ((currentIdx + 1) / total) * 100;
+  document.getElementById('progressBar').style.width = pct + '%';
+}
+
+function nextQuestion() {
+  currentIdx++;
+  renderQuestion();
+}
+
+function showResult() {
+  document.getElementById('quizArea').style.display = 'none';
+  const total = shuffledQuestions.length;
+  const pct = Math.round((correctCount / total) * 100);
+  let emoji, title, msg;
+  if (pct === 100) { emoji='🏆'; title='Xuất sắc!'; msg='Bạn trả lời đúng tất cả! Thật tuyệt vời!'; }
+  else if (pct >= 80) { emoji='🌟'; title='Rất giỏi!'; msg='Kết quả rất tốt. Tiếp tục luyện tập nhé!'; }
+  else if (pct >= 60) { emoji='👍'; title='Khá tốt!'; msg='Bạn đang tiến bộ. Ôn lại những câu sai nhé!'; }
+  else { emoji='💪'; title='Cố lên!'; msg='Hãy ôn lại lý thuyết trọng âm và thử lại!'; }
+  document.getElementById('resultEmoji').textContent = emoji;
+  document.getElementById('resultTitle').textContent = title;
+  document.getElementById('resultScore').textContent = `${correctCount} / ${total}`;
+  document.getElementById('resultMsg').textContent = msg;
+  document.getElementById('resultScreen').classList.add('visible');
+}
+
+function restartSet() {
+  initSet(currentSet);
+}
+
+// Build set buttons
+window.onload = () => {
+  const container = document.getElementById('setButtons');
+  [1,2,3,4,5].forEach(n => {
+    const btn = document.createElement('button');
+    btn.className = 'set-btn';
+    btn.dataset.set = n;
+    btn.textContent = `Set ${n}`;
+    btn.onclick = () => initSet(n);
+    container.appendChild(btn);
+  });
+  initSet(1);
+};
+</script>
+</body>
+</html>
